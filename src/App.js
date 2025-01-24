@@ -69,9 +69,9 @@ const Chat = () => {
           return;
         }
   
-        const username = user; // Extract username from user object
+        const username = user; 
   
-        // Send message to the WebSocket server
+        
         socket.emit("message", { username, text: message, token });
         console.log("message sent to backend server");
   
@@ -80,12 +80,12 @@ const Chat = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+            Authorization: `Bearer ${token}`, 
           },
           body: JSON.stringify({
             data: {
-              // "username": username, // Include username
-              "message": message,  // The message text
+              // "username": username, 
+              "message": message,  
             },
           }),
         });
@@ -109,8 +109,26 @@ const Chat = () => {
     }
   };
 
+  const handleLogout = () => {
+    // Clear localStorage
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    
+    // Disconnect socket
+    socket.disconnect();
+    
+    // Force page reload to reset app state
+    window.location.href = "/login";
+  };
+
   return (
     <div className="chat-container">
+      <div className="chat-header">
+        <h2>Ayna Chat</h2>
+        <button className="logout-button" onClick={handleLogout}>
+          Logout
+        </button>
+      </div>
       <div className="chat-box">
         <div className="messages">
           {messages.map((msg, index) => {
@@ -140,21 +158,60 @@ const Chat = () => {
 // Main App component with routing
 const App = () => {
   const [token, setToken] = useState(localStorage.getItem("token") || "");
+  const [isValidToken, setIsValidToken] = useState(false);
 
+  // Verify token validity when component mounts
+  useEffect(() => {
+    const validateToken = async () => {
+      if (!token) {
+        // Clear any stale data if no token exists
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        setIsValidToken(false);
+        return;
+      }
+
+      try {
+        // Make a request to your backend to validate the token
+        const response = await fetch("http://localhost:1337/api/users/me", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          // Token is invalid or expired
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          setToken("");
+          setIsValidToken(false);
+        } else {
+          setIsValidToken(true);
+        }
+      } catch (error) {
+        console.error("Token validation error:", error);
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        setToken("");
+        setIsValidToken(false);
+      }
+    };
+
+    validateToken();
+  }, [token]);
 
   return (
     <Router>
       <Routes>
-        {/* Protect the chat route by checking if the user is logged in */}
         <Route
           path="/chat"
-          element={token ? <Chat /> : <Navigate to="/login" />}
+          element={token && isValidToken ? <Chat /> : <Navigate to="/login" />}
         />
         
-        {/* Login route */}
         <Route
           path="/login"
-          element={!token ? <Login setToken={setToken} /> : <Navigate to="/chat" />}
+          element={!token || !isValidToken ? <Login setToken={setToken} /> : <Navigate to="/chat" />}
         />
         
         {/* Signup route */}

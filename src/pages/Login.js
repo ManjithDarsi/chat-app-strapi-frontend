@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import "./LoginCard.css"; // Import custom styles
+import { Link } from 'react-router-dom';
 
 const Login = ({ setToken }) => {
   const [identifier, setIdentifier] = useState("");
@@ -52,6 +53,9 @@ const Login = ({ setToken }) => {
           />
           <button type="submit">Login</button>
         </form>
+        <div className="signup-link">
+          New user? <Link to="/signup">Sign up here</Link>
+        </div>
       </div>
     </div>
   );
