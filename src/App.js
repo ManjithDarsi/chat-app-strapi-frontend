@@ -9,12 +9,12 @@ import "./styles.css";
 const Chat = () => {
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
-  const socket = io("http://localhost:1337");
+  const socket = io("https://chat-app-strapi-backend.onrender.com");
 
   // Fetch previous messages from the backend
   const fetchMessages = async () => {
     try {
-      const response = await fetch("http://localhost:1337/api/chat-messages", {
+      const response = await fetch("https://chat-app-strapi-backend.onrender.com/api/chat-messages", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -76,7 +76,7 @@ const Chat = () => {
         console.log("message sent to backend server");
   
         // Save the message to the backend
-        const response = await fetch("http://localhost:1337/api/chat-messages", {
+        const response = await fetch("https://chat-app-strapi-backend.onrender.com/api/chat-messages", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -173,7 +173,7 @@ const App = () => {
 
       try {
         // Make a request to your backend to validate the token
-        const response = await fetch("http://localhost:1337/api/users/me", {
+        const response = await fetch("https://chat-app-strapi-backend.onrender.com/api/users/me", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,

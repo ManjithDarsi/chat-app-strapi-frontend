@@ -10,7 +10,7 @@ const Login = ({ setToken }) => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:1337/api/auth/local", {
+      const response = await axios.post("https://chat-app-strapi-backend.onrender.com/api/auth/local", {
         identifier,
         password,
       });
